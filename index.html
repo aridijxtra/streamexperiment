@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vlees & Gezondheid</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #D4960A;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  gap: 2.5rem;
+}
+
+/* ── SHARED CARD ── */
+.card {
+  width: 100%;
+  max-width: 700px;
+  background: #D4960A;
+  border: 2px solid rgba(0,0,0,0.18);
+  border-radius: 16px;
+  padding: 1.8rem 2rem;
+}
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.4);
+  margin-bottom: 1.4rem;
+}
+
+/* ── VERSIE 1: FLASH ── */
+#flash-stage {
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0 1.5rem;
+}
+#flash-txt {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #000;
+  text-align: center;
+  line-height: 1.2;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+/* ── VERSIE 2: TICKER ── */
+#ticker-wrap {
+  overflow: hidden;
+  position: relative;
+  height: 60px;
+  margin-bottom: 1.5rem;
+}
+#ticker-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  white-space: nowrap;
+  position: absolute;
+  left: 0; top: 0;
+  will-change: transform;
+}
+.tick-chunk {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #000;
+  padding: 0 26px;
+}
+.tick-sep {
+  font-size: 18px;
+  color: rgba(0,0,0,0.25);
+}
+
+/* ── CONTROLS ── */
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cbtn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.22);
+  background: rgba(0,0,0,0.08);
+  color: #000;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.cbtn:hover { background: rgba(0,0,0,0.16); }
+.cbtn:active { transform: scale(0.93); }
+.prog-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  width: 0%;
+  background: #000;
+  border-radius: 2px;
+  transition: width 0.2s linear;
+}
+.cmeta {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.38);
+  min-width: 52px;
+  text-align: right;
+}
+</style>
+</head>
+<body>
+
+<!-- VERSIE 1: FLASH -->
+<div class="card">
+  <div class="card-label">Versie 1 — Flash &nbsp;·&nbsp; 2 seconden per fragment</div>
+  <div id="flash-stage">
+    <div id="flash-txt"></div>
+  </div>
+  <div class="ctrl-row">
+    <button class="cbtn" id="f-btn" onclick="flashToggle()" aria-label="Afspelen of pauzeren">&#9654;</button>
+    <div class="prog-bar"><div class="prog-fill" id="f-fill"></div></div>
+    <span class="cmeta" id="f-meta"></span>
+  </div>
+</div>
+
+<!-- VERSIE 2: TICKER -->
+<div class="card">
+  <div class="card-label">Versie 2 — Treintje &nbsp;·&nbsp; doorlopend van rechts naar links</div>
+  <div id="ticker-wrap">
+    <div id="ticker-inner"></div>
+  </div>
+  <div class="ctrl-row">
+    <button class="cbtn" id="t-btn" onclick="tickerToggle()" aria-label="Afspelen of pauzeren">&#9654;</button>
+    <span class="cmeta" id="t-meta">Druk op &#9654;</span>
+  </div>
+</div>
+
+<script>
+const chunks = ["Gezondheid wordt","voor een groot deel","bepaald door","wat iemand eet.","Tegenwoordig weten we","dat vlees weliswaar","belangrijke voedingsstoffen bevat,","maar ook nadelen kan hebben","voor de gezondheid.","Een recent wetenschappelijk artikel","onderzocht meer dan 1000 studies","naar de effecten","van vlees eten.","Er werd onderscheid gemaakt","tussen rood vlees \u2014","eigenlijk alle soorten vlees,","behalve kip en vis \u2014","en bewerkt vlees,","zoals worstjes","en vleeswaren voor op brood.","Zij concluderen:","meer rood en bewerkt vlees","hangt samen met","een grotere kans op","kanker van de lymfeklieren,","maag, darmen en de blaas.","Ook de kans","op hart en vaatziekten","hangt samen met vleeseten.","Zes grote studies","met meer dan","een half miljoen deelnemers","lieten zien:","100 gram bewerkt vlees per dag","leidt al tot een verdubbeling","van de kans","op hart en vaatziekten.","Het heeft waarschijnlijk","te maken met","de hoeveelheid zout","in bewerkt vlees,","die de bloeddruk verhoogt.","Ook hangt vleeseten samen","met een hogere kans","op diabetes.","Hoewel tientallen studies","dit laten zien,","zijn er nog onzekerheden.","Wetenschappers","stellen hoge eisen","aan hun bewijs.","Maar deze studies","tonen aan:","vleeseten heeft minstens","een klein negatief effect.","Vleeseten is niet","zo slecht als roken,","maar elke 100 gram","meer vlees per dag","verhoogt de kans op kanker,","hart- en vaatziekten","en vroegtijdige dood,","een klein beetje.","De aanbeveling is daarom:","Eet minder vlees!","Dit doe je verstandig","door vleesvervangers.","Peulvruchten, sojaproducten,","noten en pitten","bevatten veel gezonde eiwitten.","Twee dagen per week","geen vlees","is al een mooie stap.","Of alleen in het weekend","vlees op je brood.","Dat helpt echt.","In kleine stappen","is het veel gemakkelijker.","Zoek vleesvervangers","die bij jou passen,","die je lekker vindt","en niet nadelig","voor je gezondheid zijn."];
+
+/* ── VERSIE 1: FLASH ── */
+var fIdx=0, fTimer=null, fRunning=false;
+var fTxt=document.getElementById('flash-txt');
+var fBtn=document.getElementById('f-btn');
+var fFill=document.getElementById('f-fill');
+var fMeta=document.getElementById('f-meta');
+
+function flashShow(i){
+  fTxt.style.opacity=0;
+  setTimeout(function(){
+    fTxt.textContent=chunks[i];
+    fFill.style.width=((i+1)/chunks.length*100).toFixed(1)+'%';
+    fMeta.textContent=(i+1)+' / '+chunks.length;
+    fTxt.style.opacity=1;
+  },160);
+}
+function flashNext(){
+  if(fIdx>=chunks.length){
+    fRunning=false;
+    fBtn.innerHTML='&#8635;';
+    fTxt.style.opacity=0;
+    fMeta.textContent='Klaar';
+    return;
+  }
+  flashShow(fIdx++);
+  fTimer=setTimeout(flashNext,2000);
+}
+function flashToggle(){
+  if(!fRunning && fIdx>=chunks.length){ fIdx=0; fFill.style.width='0%'; }
+  if(fRunning){
+    fRunning=false; clearTimeout(fTimer);
+    fTxt.style.opacity=0.3;
+    fBtn.innerHTML='&#9654;';
+  } else {
+    fRunning=true;
+    fBtn.innerHTML='&#9646;&#9646;';
+    flashNext();
+  }
+}
+
+/* ── VERSIE 2: TICKER ── */
+var tickerInner=document.getElementById('ticker-inner');
+var tBtn=document.getElementById('t-btn');
+var tMeta=document.getElementById('t-meta');
+var tickerRunning=false, tickerRaf=null, tickerX=0, tickerSpeed=90;
+var tickerWidth=0, lastT=null;
+
+function buildTicker(){
+  tickerInner.innerHTML='';
+  var all=chunks.concat(chunks);
+  all.forEach(function(c,i){
+    var s=document.createElement('span');
+    s.className='tick-chunk';
+    s.textContent=c;
+    tickerInner.appendChild(s);
+    var sep=document.createElement('span');
+    sep.className='tick-sep';
+    sep.textContent=' \u25C6 ';
+    tickerInner.appendChild(sep);
+  });
+  requestAnimationFrame(function(){
+    tickerWidth=tickerInner.scrollWidth/2;
+    tickerX=document.getElementById('ticker-wrap').offsetWidth;
+    tickerInner.style.transform='translateX('+tickerX+'px)';
+  });
+}
+
+function tickerTick(ts){
+  if(!tickerRunning) return;
+  if(lastT===null) lastT=ts;
+  var dt=(ts-lastT)/1000; lastT=ts;
+  tickerX-=tickerSpeed*dt;
+  if(tickerX<=-tickerWidth) tickerX+=tickerWidth;
+  tickerInner.style.transform='translateX('+tickerX.toFixed(2)+'px)';
+  tickerRaf=requestAnimationFrame(tickerTick);
+}
+
+function tickerToggle(){
+  if(tickerRunning){
+    tickerRunning=false; lastT=null;
+    cancelAnimationFrame(tickerRaf);
+    tBtn.innerHTML='&#9654;';
+    tMeta.textContent='Gepauzeerd';
+  } else {
+    tickerRunning=true; lastT=null;
+    tBtn.innerHTML='&#9646;&#9646;';
+    tMeta.textContent='Loopt \u2192';
+    tickerRaf=requestAnimationFrame(tickerTick);
+  }
+}
+
+buildTicker();
+</script>
+</body>
+</html>
